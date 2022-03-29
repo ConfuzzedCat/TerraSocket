@@ -6,39 +6,43 @@ using Terraria.ModLoader;
 
 namespace TerraSocket
 {
+
+    /// <summary>
+    /// This class contains 
+    /// </summary>
     [HarmonyPatch]
     class TerraPatches
     {
-
-        /*
-        [HarmonyPostfix]
-        [HarmonyPatch(typeof(Player), nameof(Player.Hurt))]
-        static void PlayerHurtPostfix(Player __instance, PlayerDeathReason damageSource, int Damage, int hitDirection, bool pvp = false, bool quiet = false, bool Crit = false, int cooldownCounter = -1)
-        {
-            string player = Main.player[__instance.whoAmI].name;
-            if (TerraSocket.TryGetCausingEntity(damageSource, out string source))
-            {
-                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("PlayerDamaged", true, new WebSocketMessageModel.ContextInfo(player, new WebSocketMessageModel.ContextInfo.ContextPlayerDamage(Damage, Crit, pvp, quiet, hitDirection, source))));
-            }
-            else
-            {
-                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("PlayerDamaged", true));
-            }
-        }
-        */
-
+        /// <summary>
+        /// This sends a WebSocket message when the player takes damage from a npc.
+        /// </summary>
         [HarmonyPostfix]
         [HarmonyPatch(typeof(ModPlayer), nameof(ModPlayer.OnHitByNPC))]
         static void PlayerDamaged(ModPlayer __instance, NPC npc, int damage, bool crit)
         {
             string player = __instance.Name;
             string npcName = npc.FullName;
-            WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("PlayerDamaged", true, new WebSocketMessageModel.ContextInfo(player, new WebSocketMessageModel.ContextInfo.ContextPlayerDamage(damage, crit, false, false, 0, npcName))));
+            WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("PlayerDamaged", true, new WebSocketMessageModel.ContextInfo(player, new WebSocketMessageModel.ContextInfo.ContextPlayerDamage(damage, crit, false, false, 0, "NPC", npcName))));
         }
 
+        /// <summary>
+        /// This sends a WebSocket message when the player takes damage from a projectile.
+        /// </summary>
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(ModPlayer), nameof(ModPlayer.OnHitByProjectile))]
+        static void PlayerHitWithProj(Projectile proj, int damage, bool crit, Player __instance)
+        {
+            string player = __instance.name;
+            string projName = proj.Name;
+            WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("PlayerDamaged", true, new WebSocketMessageModel.ContextInfo(player, new WebSocketMessageModel.ContextInfo.ContextPlayerDamage(damage, crit, false, false, 0, "Projectile".ToUpper(), projName))));
+        }
+
+        /// <summary>
+        /// This sends a WebSocket message when a npc killed. TODO: send one on damage too.
+        /// </summary>
         [HarmonyPostfix]
         [HarmonyPatch(typeof(ModPlayer), nameof(ModPlayer.OnHitNPC))]
-        static void NPCKilledPostfix(Item item, NPC target, int damage, float knockback, bool crit, Player __instance)
+        static void NPCHitPostfix(Item item, NPC target, int damage, float knockback, bool crit, Player __instance)
         {
             if(target.life < 0)
             {
@@ -54,5 +58,4 @@ namespace TerraSocket
             }
         }
     }
-
 }

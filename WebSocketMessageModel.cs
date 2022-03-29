@@ -20,7 +20,7 @@
         public SemVersion webSocketServerVersion { get; private set; }
         private void SetWebSocketServerVersion()
         {
-            webSocketServerVersion = new SemVersion(0,2,2);
+            webSocketServerVersion = new SemVersion(0,2,3);
         }
         public string Event { get; set; }
         public string Status { get; set; }
@@ -53,21 +53,23 @@
             public ContextNpcKilled npcKilled { get; set; }
             public class ContextPlayerDamage
             {
-                public ContextPlayerDamage(double damage = 0, bool crit = false, bool pvp = false, bool quiet = false, int hitDirection = 0, string source = null)
+                public ContextPlayerDamage(double damage = 0, bool crit = false, bool pvp = false, bool quiet = false, int hitDirection = 0, string sourceType = null, string sourceName = null)
                 {
                     this.damage = damage;
                     this.crit = crit;
                     this.pvp = pvp;
                     this.quiet = quiet;
                     this.hitDirection = hitDirection;
-                    this.source = source;
+                    this.SourceType = sourceType;
+                    this.SourceName = sourceName;
                 }
                 public bool pvp { get; set; }
                 public bool quiet { get; set; }
                 public double damage { get; set; }
                 public int hitDirection { get; set; }
                 public bool crit { get; set; }
-                public string source { get; set; }
+                public string SourceType { get; set; }
+                public string SourceName { get; set; }
             }
 
             public class ContextNpcDamage
