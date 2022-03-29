@@ -1,0 +1,6 @@
+displayName = TerraSocket
+author = ConfuzzedCat
+version = 1.0.0
+dllReferences = websocket-sharp, 0Harmony
+includeSource = true
+buildIgnore = *.csproj, *.user, obj\*, bin\*, .vs\*, Old\*
