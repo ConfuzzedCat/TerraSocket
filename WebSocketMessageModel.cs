@@ -20,7 +20,7 @@
         public SemVersion webSocketServerVersion { get; private set; }
         private void SetWebSocketServerVersion()
         {
-            webSocketServerVersion = new SemVersion(0,2,1);
+            webSocketServerVersion = new SemVersion(0,2,2);
         }
         public string Event { get; set; }
         public string Status { get; set; }
@@ -72,20 +72,22 @@
 
             public class ContextNpcDamage
             {
-                //TODO: Find a method to get the damage to a npc
+                //TODO
             }
 
             public class ContextNpcKilled
             {
-                public ContextNpcKilled(string npcname = null, string source = null, int npcLifePreHit = 0, int damageDealt = 0, int overflowDamage = 0)
+                public ContextNpcKilled(string npcname = null, string sourceWithPrefix = null, string source = null, int npcLifePreHit = 0, int damageDealt = 0, int overflowDamage = 0)
                 {
                     this.NPCname = npcname;
+                    this.SourceWithPrefix = sourceWithPrefix;
                     this.Source = source;
                     this.NPCLifePreHit = npcLifePreHit;
                     this.DamageDealt = damageDealt;
                     this.OverflowDamage = overflowDamage;
                 }
                 public string NPCname { get; set; }
+                public string SourceWithPrefix { get; set; }
                 public string Source { get; set; }
                 public int NPCLifePreHit { get; set; }
                 public int DamageDealt { get; set; }
