@@ -27,6 +27,9 @@ namespace TerraSocket
         {
             base.OnHitByProjectile(proj, damage, crit);
         }
-
+        public override void OnHitNPCWithProj(Projectile proj, NPC target, int damage, float knockback, bool crit)
+        {
+            base.OnHitNPCWithProj(proj, target, damage, knockback, crit);
+        }
     }
 }

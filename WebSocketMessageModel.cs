@@ -41,10 +41,11 @@
 
         public class ContextInfo
         {
-            public ContextInfo(string player = null, ContextPlayerDamage contextPlayerDamage = null, ContextNpcKilled npcKilled = null)
+            public ContextInfo(string player = null, ContextPlayerDamage contextPlayerDamage = null, ContextNpcDamage npcDamage = null, ContextNpcKilled npcKilled = null)
             {
                 this.player = player;
                 this.PlayerDamage = contextPlayerDamage;
+                this.NpcDamage = npcDamage;
                 this.npcKilled = npcKilled;
             }
             public string player { get; set; }
@@ -74,23 +75,41 @@
 
             public class ContextNpcDamage
             {
-                //TODO
+                public ContextNpcDamage(string npcName = null, string sourceType = null, string sourceName = null, string sourcePlayer = null, int npcLifePreHit = 0, int damageDealt = 0)
+                {
+                    this.NpcName = npcName;
+                    this.SourceType = sourceType;
+                    this.SourceName = sourceName;
+                    this.SourcePlayer = sourcePlayer;
+                    this.NPCLifePreHit = npcLifePreHit;
+                    this.DamageDealt = damageDealt;
+                }
+                public string NpcName { get; set; }
+                public string SourceType { get; set; }
+                public string SourceName { get; set; }
+                public string SourcePlayer { get; set; }
+                public int NPCLifePreHit { get; set; }
+                public int DamageDealt { get; set; }
             }
 
             public class ContextNpcKilled
             {
-                public ContextNpcKilled(string npcname = null, string sourceWithPrefix = null, string source = null, int npcLifePreHit = 0, int damageDealt = 0, int overflowDamage = 0)
+                public ContextNpcKilled(string npcname = null, string sourceWithPrefix = null, string sourceType = null, string sourceName = null, string sourcePlayer = null, int npcLifePreHit = 0, int damageDealt = 0, int overflowDamage = 0)
                 {
                     this.NPCname = npcname;
                     this.SourceWithPrefix = sourceWithPrefix;
-                    this.Source = source;
+                    this.SourceType = sourceType;
+                    this.SourceName = sourceName;
+                    this.SourcePlayer = sourcePlayer;
                     this.NPCLifePreHit = npcLifePreHit;
                     this.DamageDealt = damageDealt;
                     this.OverflowDamage = overflowDamage;
                 }
                 public string NPCname { get; set; }
                 public string SourceWithPrefix { get; set; }
-                public string Source { get; set; }
+                public string SourceType { get; set; }
+                public string SourceName { get; set; }
+                public string SourcePlayer { get; set; }
                 public int NPCLifePreHit { get; set; }
                 public int DamageDealt { get; set; }
                 public int OverflowDamage { get; set; }

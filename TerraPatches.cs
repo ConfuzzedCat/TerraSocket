@@ -1,7 +1,5 @@
 ﻿using HarmonyLib;
-using Mono.Cecil;
 using Terraria;
-using Terraria.DataStructures;
 using Terraria.ModLoader;
 
 namespace TerraSocket
@@ -30,11 +28,11 @@ namespace TerraSocket
         /// </summary>
         [HarmonyPostfix]
         [HarmonyPatch(typeof(ModPlayer), nameof(ModPlayer.OnHitByProjectile))]
-        static void PlayerHitWithProj(Projectile proj, int damage, bool crit, Player __instance)
+        static void PlayerHitWithProj(Projectile proj, int damage, bool crit, ModPlayer __instance)
         {
-            string player = __instance.name;
+            string player = __instance.Name;
             string projName = proj.Name;
-            WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("PlayerDamaged", true, new WebSocketMessageModel.ContextInfo(player, new WebSocketMessageModel.ContextInfo.ContextPlayerDamage(damage, crit, false, false, 0, "Projectile".ToUpper(), projName))));
+            WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("PlayerDamaged", true, new WebSocketMessageModel.ContextInfo(player, new WebSocketMessageModel.ContextInfo.ContextPlayerDamage(damage, crit, false, false, 0, "PROJECTILE", projName))));
         }
 
         /// <summary>
@@ -42,20 +40,31 @@ namespace TerraSocket
         /// </summary>
         [HarmonyPostfix]
         [HarmonyPatch(typeof(ModPlayer), nameof(ModPlayer.OnHitNPC))]
-        static void NPCHitPostfix(Item item, NPC target, int damage, float knockback, bool crit, Player __instance)
+        static void NPCHitPostfix(Item item, NPC target, int damage, float knockback, bool crit, ModPlayer __instance)
         {
-            if(target.life < 0)
+            string playerName = __instance.Name;
+            string itemNameWithPrefix = item.HoverName;
+            string itemName = item.Name;
+            string npcName = target.FullName;
+            if (target.life < 0)
             {
-                string playerName = __instance.name;
-                string itemNameWithPrefix = item.HoverName;
-                string itemName = item.Name;
-                string npcName = target.FullName;
-                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("NPCKilled", true, new WebSocketMessageModel.ContextInfo(playerName, null, new WebSocketMessageModel.ContextInfo.ContextNpcKilled(npcName, itemNameWithPrefix, itemName,target.life+damage, damage, target.life*-1))));
+                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("NPCKilled", true, new WebSocketMessageModel.ContextInfo(playerName, null, null, new WebSocketMessageModel.ContextInfo.ContextNpcKilled(npcName, itemNameWithPrefix, "MEELEE_ITEM", itemName, playerName, target.life + damage, damage, target.life * -1))));
             }
             else
             {
-                //TODO: Send message on damage.
+                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("NPCHit", true, new WebSocketMessageModel.ContextInfo(playerName, null, new WebSocketMessageModel.ContextInfo.ContextNpcDamage(npcName, "MEELEE_ITEM", itemName, playerName, target.life +damage, damage), null)));
             }
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(ModPlayer), nameof(ModPlayer.OnHitNPCWithProj))]
+        static void NPCHitWithProjPostfix(Projectile proj, NPC target, int damage, float knockback, bool crit, ModPlayer __instance)
+        {
+            string playerName = __instance.Name;
+            string projName = proj.Name;
+            string npcName = target.FullName;
+            WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("NPCHit", true, new WebSocketMessageModel.ContextInfo(playerName, null, new WebSocketMessageModel.ContextInfo.ContextNpcDamage(npcName, "PROJECTILE", projName, playerName, target.life + damage, damage), null)));
+
         }
     }
 }
