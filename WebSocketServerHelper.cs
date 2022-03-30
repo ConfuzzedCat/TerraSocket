@@ -23,7 +23,12 @@ namespace TerraSocket
         {
             string jsonMessage = JsonConvert.SerializeObject(msg);
             if (wssv != null)
+            {
                 wssv.WebSocketServices.Broadcast(jsonMessage);
+                TerraSocket._logger.Debug($"\"{msg.Event}\" sent to clients.");
+            }
+                
+                
         }
     }
     public class Startup : WebSocketBehavior
