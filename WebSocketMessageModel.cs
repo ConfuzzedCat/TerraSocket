@@ -20,7 +20,7 @@
         public SemVersion webSocketServerVersion { get; private set; }
         private void SetWebSocketServerVersion()
         {
-            webSocketServerVersion = new SemVersion(0, 4, 0);
+            webSocketServerVersion = new SemVersion(0, 5, 0);
         }
         public string Event { get; set; }
         public string Status { get; set; }
@@ -41,19 +41,21 @@
 
         public class ContextInfo
         {
-            public ContextInfo(string player = null, ContextPlayerDamage contextPlayerDamage = null, ContextNPCDamage npcDamage = null, ContextNPCKilled npcKilled = null, ContextPlayerKilled playerKilled = null)
+            public ContextInfo(string player = null, ContextPlayerDamage contextPlayerDamage = null, ContextNPCDamage npcDamage = null, ContextNPCKilled npcKilled = null, ContextPlayerKilled playerKilled = null, ContextBossSpawn bossSpawn = null)
             {
                 Player = player;
                 PlayerDamage = contextPlayerDamage;
                 NPCDamage = npcDamage;
                 NPCKilled = npcKilled;
                 PlayerKilled = playerKilled;
+                BossSpawn = bossSpawn;
             }
             public string Player { get; set; }
             public ContextPlayerDamage PlayerDamage { get; set; }
             public ContextNPCDamage NPCDamage { get; set; }
             public ContextNPCKilled NPCKilled { get; set; }
             public ContextPlayerKilled PlayerKilled { get; set; }
+            public ContextBossSpawn BossSpawn { get; set; }
             public class ContextPlayerDamage
             {
                 public ContextPlayerDamage(string playername, double damage = 0, bool crit = false, bool pvp = false, bool quiet = false, int hitDirection = 0, string sourceType = null, string sourceName = null)
@@ -136,6 +138,17 @@
                 public int PlayerLifePreHit { get; set; }
                 public int DamageDealt { get; set; }
                 public int OverflowDamage { get; set; }
+            }
+
+            public class ContextBossSpawn
+            {
+                public ContextBossSpawn(string name, int hp)
+                {
+                    Name = name;
+                    Lifepoints = hp;
+                }
+                public string Name { get; set; }
+                public int Lifepoints { get; set; }
             }
         }
     }

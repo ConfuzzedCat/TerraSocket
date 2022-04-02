@@ -56,5 +56,11 @@ namespace TerraSocket
             }
             return false;
         }
+
+
+        public override void PostUpdateEverything()
+        {
+            base.PostUpdateEverything();
+        }
     }
 }

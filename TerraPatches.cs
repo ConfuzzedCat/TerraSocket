@@ -1,5 +1,7 @@
 ﻿using HarmonyLib;
+using Steamworks;
 using Terraria;
+using Terraria.GameContent.Events;
 using Terraria.ModLoader;
 
 namespace TerraSocket
@@ -152,6 +154,38 @@ namespace TerraSocket
         static void PlayerDisconnectPostfix(Player player)
         {
             WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("PlayerDisconnect", true, new WebSocketMessageModel.ContextInfo(player.name)));
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(Mod), nameof(Mod.PostUpdateEverything))]
+        static void EventsPostfix()
+        {
+            if (BirthdayParty.PartyIsUp)
+            {
+                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("PartyEvent", true));
+            }
+            if (Sandstorm.Happening)
+            {
+                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("SandstormEvent", true));
+            }
+
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(NPC),nameof(NPC.NewNPC))]
+        static void NPCSpawnPostfix(int __result, int X, int Y, int Type, int Start = 0, float ai0 = 0f, float ai1 = 0f, float ai2 = 0f, float ai3 = 0f, int Target = 255)
+        {
+            string npcName = Main.npc[__result].FullName;
+            int npcLife = Main.npc[__result].life;
+            switch (__result)
+            {
+                case 439:case 50:case 4: case 33:case 266:case 113: case 125:case 126:case 134:case 127:case 262:case 245:case 370:case 396:case 564:case 565:case 576:case 577:case 551:case 491:case 325:case 327:case 344:case 346:case 345:case 392:case 517:case 422:case 507:case 493:case 222:case 35:
+                    WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("BossSpawn", true, new WebSocketMessageModel.ContextInfo(null, null, null, null, null, new WebSocketMessageModel.ContextInfo.ContextBossSpawn(npcName, npcLife))));
+                    break;
+                case 437:
+                    WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("CultistRitualStarted", true));
+                    break;
+            }
         }
 
     }
