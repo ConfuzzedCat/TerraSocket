@@ -8,12 +8,10 @@ namespace TerraSocket
         public override void OnRespawn(Player player)
         {
             base.OnRespawn(player);
-            WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("OnRespawn", true, new WebSocketMessageModel.ContextInfo(player.name)));
         }
         public override void OnEnterWorld(Player player)
         {
             base.OnEnterWorld(player);
-            WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("OnEnterWorld", true, new WebSocketMessageModel.ContextInfo(player.name)));
         }
         public override void OnHitNPC(Item item, NPC target, int damage, float knockback, bool crit)
         {
@@ -31,5 +29,6 @@ namespace TerraSocket
         {
             base.OnHitNPCWithProj(proj, target, damage, knockback, crit);
         }
+
     }
 }

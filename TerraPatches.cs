@@ -11,12 +11,13 @@ namespace TerraSocket
     [HarmonyPatch]
     class TerraPatches
     {
+        #region PlayerHitPatches
         /// <summary>
         /// This sends a WebSocket message when the player takes damage from a npc.
         /// </summary>
         [HarmonyPostfix]
         [HarmonyPatch(typeof(ModPlayer), nameof(ModPlayer.OnHitByNPC))]
-        static void PlayerDamaged(ModPlayer __instance, NPC npc, int damage, bool crit)
+        static void PlayerDamaged(NPC npc, int damage, bool crit, ModPlayer __instance)
         {
             string playerName = __instance.player.name;
             string npcName = npc.FullName;
@@ -25,8 +26,8 @@ namespace TerraSocket
                 WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("PlayerKilled", true, new WebSocketMessageModel.ContextInfo(playerName, null, null, null, new WebSocketMessageModel.ContextInfo.ContextPlayerKilled(playerName, "NPC", npcName, __instance.player.statLife + damage, damage, __instance.player.statLife * -1))));
             }
             else
-            {                
-                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("PlayerHit", true, new WebSocketMessageModel.ContextInfo(playerName, new WebSocketMessageModel.ContextInfo.ContextPlayerDamage(damage, crit, false, false, 0, "NPC", npcName))));
+            {
+                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("PlayerHit", true, new WebSocketMessageModel.ContextInfo(playerName, new WebSocketMessageModel.ContextInfo.ContextPlayerDamage(playerName, damage, crit, false, false, 0, "NPC", npcName))));
             }
         }
 
@@ -39,11 +40,22 @@ namespace TerraSocket
         {
             string playerName = __instance.player.name;
             string projName = proj.Name;
-            WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("PlayerHit", true, new WebSocketMessageModel.ContextInfo(playerName, new WebSocketMessageModel.ContextInfo.ContextPlayerDamage(damage, crit, false, false, 0, "PROJECTILE", projName))));
-        }
+            if (__instance.player.statLife <= 0)
+            {
+                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("PlayerKilled", true, new WebSocketMessageModel.ContextInfo(playerName, null, null, null, new WebSocketMessageModel.ContextInfo.ContextPlayerKilled(playerName, "PROJECTILE", projName, __instance.player.statLife + damage, damage, __instance.player.statLife * -1))));
+            }
+            else
+            {
+                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("PlayerHit", true, new WebSocketMessageModel.ContextInfo(playerName, new WebSocketMessageModel.ContextInfo.ContextPlayerDamage(playerName, damage, crit, false, false, 0, "PROJECTILE", projName))));
 
+            }
+
+        }
+        #endregion
+
+        #region NPCHitPatches
         /// <summary>
-        /// This sends a WebSocket message when a npc killed. TODO: send one on damage too.
+        /// This sends a WebSocket message when a npc is either hit or killed. 
         /// </summary>
         [HarmonyPostfix]
         [HarmonyPatch(typeof(ModPlayer), nameof(ModPlayer.OnHitNPC))]
@@ -59,10 +71,13 @@ namespace TerraSocket
             }
             else
             {
-                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("NPCHit", true, new WebSocketMessageModel.ContextInfo(playerName, null, new WebSocketMessageModel.ContextInfo.ContextNPCDamage(npcName, "MEELEE_ITEM", itemName, playerName, target.life +damage, damage), null)));
+                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("NPCHit", true, new WebSocketMessageModel.ContextInfo(playerName, null, new WebSocketMessageModel.ContextInfo.ContextNPCDamage(npcName, "MEELEE_ITEM", itemName, playerName, target.life + damage, damage), null)));
             }
         }
 
+        /// <summary>
+        /// This sends a WebSocket message when a npc is either hit by a Projectile or killed by one.
+        /// </summary>
         [HarmonyPostfix]
         [HarmonyPatch(typeof(ModPlayer), nameof(ModPlayer.OnHitNPCWithProj))]
         static void NPCHitWithProjPostfix(Projectile proj, NPC target, int damage, float knockback, bool crit, ModPlayer __instance)
@@ -79,5 +94,65 @@ namespace TerraSocket
                 WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("NPCHit", true, new WebSocketMessageModel.ContextInfo(playerName, null, new WebSocketMessageModel.ContextInfo.ContextNPCDamage(npcName, "PROJECTILE", projName, playerName, target.life + damage, damage), null)));
             }
         }
+        #endregion
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(ModPlayer), nameof(ModPlayer.OnHitPvp))]
+        static void OnHitPvpPostfix(Item item, Player target, int damage, bool crit, ModPlayer __instance)
+        {
+            string playerName = __instance.player.name;
+            if (target.statLife <= 0)
+            {
+                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("PlayerPVPKill", true, new WebSocketMessageModel.ContextInfo(playerName, null, null, null, new WebSocketMessageModel.ContextInfo.ContextPlayerKilled(target.name, "MEELEE_ITEM", item.Name, target.statLife + damage, damage, target.statLife * -1))));
+            }
+            else
+            {
+                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("PlayerPVPHit", true, new WebSocketMessageModel.ContextInfo(playerName, new WebSocketMessageModel.ContextInfo.ContextPlayerDamage(target.name, damage, crit, true, false, 0, "MEELEE_ITEM", item.Name))));
+            }
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(ModPlayer), nameof(ModPlayer.OnHitPvpWithProj))]
+        static void OnHitPvpWithProjPostfix(Projectile proj, Player target, int damage, bool crit, ModPlayer __instance)
+        {
+            string playerName = __instance.player.name;
+            if (target.statLife <= 0)
+            {
+                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("PlayerPVPKill", true, new WebSocketMessageModel.ContextInfo(playerName, null, null, null, new WebSocketMessageModel.ContextInfo.ContextPlayerKilled(target.name, "PROJECTILE", proj.Name, target.statLife + damage, damage, target.statLife * -1))));
+            }
+            else
+            {
+                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("PlayerPVPHit", true, new WebSocketMessageModel.ContextInfo(playerName, new WebSocketMessageModel.ContextInfo.ContextPlayerDamage(target.name, damage, crit, true, false, 0, "PROJECTILE", proj.Name))));
+            }
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(ModPlayer), nameof(ModPlayer.OnEnterWorld))]
+        static void OnEnterWorldPostfix(Player player)
+        {
+            WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("OnEnterWorld", true, new WebSocketMessageModel.ContextInfo(player.name)));
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(ModPlayer), nameof(ModPlayer.OnRespawn))]
+        static void OnRespawnPostfix(Player player)
+        {
+            WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("OnRespawn", true, new WebSocketMessageModel.ContextInfo(player.name)));
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(ModPlayer), nameof(ModPlayer.PlayerConnect))]
+        static void PlayerConnectPostfix(Player player)
+        {
+            WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("PlayerConnect", true, new WebSocketMessageModel.ContextInfo(player.name)));
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(ModPlayer), nameof(ModPlayer.PlayerDisconnect))]
+        static void PlayerDisconnectPostfix(Player player)
+        {
+            WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("PlayerDisconnect", true, new WebSocketMessageModel.ContextInfo(player.name)));
+        }
+
     }
 }

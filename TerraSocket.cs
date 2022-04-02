@@ -28,8 +28,8 @@ namespace TerraSocket
 
         private static void PatchAll()
         {
-            _logger.Info("Intitializing patching...");
-            Harmony harmony = new Harmony("com.gmail.confuzzedcat.terrasocket.patch");
+            _logger.Info("Initializing patching...");
+            Harmony harmony = new Harmony("com.github.confuzzedcat.terraria.terrasocket");
             harmony.PatchAll();
             foreach(var method in harmony.GetPatchedMethods())
             {
