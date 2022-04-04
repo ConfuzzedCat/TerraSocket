@@ -8,7 +8,7 @@
             Event = _event;
             if (status)
             {
-                Status = "Succes";
+                Status = "Success";
             }
             else
             {
@@ -20,7 +20,7 @@
         public SemVersion webSocketServerVersion { get; private set; }
         private void SetWebSocketServerVersion()
         {
-            webSocketServerVersion = new SemVersion(0, 5, 1);
+            webSocketServerVersion = new SemVersion(0, 5, 2);
         }
         public string Event { get; set; }
         public string Status { get; set; }

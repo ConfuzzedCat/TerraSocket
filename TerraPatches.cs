@@ -221,5 +221,13 @@ namespace TerraSocket
             }
         }
 
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(Terraria.Social.Base.AchievementsSocialModule), nameof(Terraria.Social.Base.AchievementsSocialModule.CompleteAchievement))]
+        static void OnAchievementCompletePostfix(string name)
+        {
+            WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("AchievementComplete", true));
+        }
+
     }
 }
