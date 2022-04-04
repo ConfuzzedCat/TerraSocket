@@ -228,7 +228,7 @@ namespace TerraSocket
         {
             if (__instance.IsCompleted)
             {
-                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("AchievementComplete", true));
+                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("AchievementComplete", true, new WebSocketMessageModel.ContextInfo(null, __instance.Name)));
             }            
         }
     }

@@ -20,7 +20,7 @@
         public SemVersion webSocketServerVersion { get; private set; }
         private void SetWebSocketServerVersion()
         {
-            webSocketServerVersion = new SemVersion(0, 5, 3);
+            webSocketServerVersion = new SemVersion(0, 5, 4);
         }
         public string Event { get; set; }
         public string Status { get; set; }
