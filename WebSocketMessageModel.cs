@@ -20,7 +20,7 @@
         public SemVersion webSocketServerVersion { get; private set; }
         private void SetWebSocketServerVersion()
         {
-            webSocketServerVersion = new SemVersion(0, 5, 2);
+            webSocketServerVersion = new SemVersion(0, 5, 3);
         }
         public string Event { get; set; }
         public string Status { get; set; }
@@ -41,9 +41,10 @@
 
         public class ContextInfo
         {
-            public ContextInfo(string player = null, ContextPlayerDamage contextPlayerDamage = null, ContextNPCDamage npcDamage = null, ContextNPCKilled npcKilled = null, ContextPlayerKilled playerKilled = null, ContextBossSpawn bossSpawn = null)
+            public ContextInfo(string player = null, string achievement = null, ContextPlayerDamage contextPlayerDamage = null, ContextNPCDamage npcDamage = null, ContextNPCKilled npcKilled = null, ContextPlayerKilled playerKilled = null, ContextBossSpawn bossSpawn = null)
             {
                 Player = player;
+                Achievement = achievement;
                 PlayerDamage = contextPlayerDamage;
                 NPCDamage = npcDamage;
                 NPCKilled = npcKilled;
@@ -51,6 +52,7 @@
                 BossSpawn = bossSpawn;
             }
             public string Player { get; set; }
+            public string Achievement { get; set; }
             public ContextPlayerDamage PlayerDamage { get; set; }
             public ContextNPCDamage NPCDamage { get; set; }
             public ContextNPCKilled NPCKilled { get; set; }

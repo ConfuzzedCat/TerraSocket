@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using Terraria;
+using Terraria.Achievements;
 using Terraria.GameContent.Events;
 using Terraria.ModLoader;
 
@@ -109,11 +110,11 @@ namespace TerraSocket
             string playerName = __instance.player.name;
             if (target.statLife <= 0)
             {
-                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("PlayerPVPKill", true, new WebSocketMessageModel.ContextInfo(playerName, null, null, null, new WebSocketMessageModel.ContextInfo.ContextPlayerKilled(target.name, "MEELEE_ITEM", item.Name, target.statLife + damage, damage, target.statLife * -1))));
+                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("PlayerPVPKill", true, new WebSocketMessageModel.ContextInfo(playerName, null, null, null, null, new WebSocketMessageModel.ContextInfo.ContextPlayerKilled(target.name, "MEELEE_ITEM", item.Name, target.statLife + damage, damage, target.statLife * -1))));
             }
             else
             {
-                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("PlayerPVPHit", true, new WebSocketMessageModel.ContextInfo(playerName, new WebSocketMessageModel.ContextInfo.ContextPlayerDamage(target.name, damage, crit, true, false, 0, "MEELEE_ITEM", item.Name))));
+                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("PlayerPVPHit", true, new WebSocketMessageModel.ContextInfo(playerName, null, new WebSocketMessageModel.ContextInfo.ContextPlayerDamage(target.name, damage, crit, true, false, 0, "MEELEE_ITEM", item.Name))));
             }
         }
 
@@ -124,11 +125,11 @@ namespace TerraSocket
             string playerName = __instance.player.name;
             if (target.statLife <= 0)
             {
-                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("PlayerPVPKill", true, new WebSocketMessageModel.ContextInfo(playerName, null, null, null, new WebSocketMessageModel.ContextInfo.ContextPlayerKilled(target.name, "PROJECTILE", proj.Name, target.statLife + damage, damage, target.statLife * -1))));
+                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("PlayerPVPKill", true, new WebSocketMessageModel.ContextInfo(playerName, null, null, null, null, new WebSocketMessageModel.ContextInfo.ContextPlayerKilled(target.name, "PROJECTILE", proj.Name, target.statLife + damage, damage, target.statLife * -1))));
             }
             else
             {
-                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("PlayerPVPHit", true, new WebSocketMessageModel.ContextInfo(playerName, new WebSocketMessageModel.ContextInfo.ContextPlayerDamage(target.name, damage, crit, true, false, 0, "PROJECTILE", proj.Name))));
+                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("PlayerPVPHit", true, new WebSocketMessageModel.ContextInfo(playerName, null, new WebSocketMessageModel.ContextInfo.ContextPlayerDamage(target.name, damage, crit, true, false, 0, "PROJECTILE", proj.Name))));
             }
         }
 
@@ -210,7 +211,7 @@ namespace TerraSocket
             int npcLife = npc.life;
             if (npc.boss)
             {
-                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("BossSpawn", true, new WebSocketMessageModel.ContextInfo(null, null, null, null, null, new WebSocketMessageModel.ContextInfo.ContextBossSpawn(npcName, npcLife))));
+                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("BossSpawn", true, new WebSocketMessageModel.ContextInfo(null, null, null, null, null, null, new WebSocketMessageModel.ContextInfo.ContextBossSpawn(npcName, npcLife))));
             }
 
             switch (__result)
@@ -221,13 +222,14 @@ namespace TerraSocket
             }
         }
 
-
-        [HarmonyPostfix]
-        [HarmonyPatch(typeof(Terraria.Social.Base.AchievementsSocialModule), nameof(Terraria.Social.Base.AchievementsSocialModule.CompleteAchievement))]
-        static void OnAchievementCompletePostfix(string name)
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(AchievementCondition), nameof(AchievementCondition.Complete))]
+        static void OnAchievementCompletePrefix(AchievementCondition __instance)
         {
-            WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("AchievementComplete", true));
+            if (__instance.IsCompleted)
+            {
+                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("AchievementComplete", true));
+            }            
         }
-
     }
 }
