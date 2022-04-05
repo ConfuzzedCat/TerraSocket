@@ -13,9 +13,12 @@ namespace TerraSocket
     [HarmonyPatch]
     class TerraPatches
     {
-        private static bool EventIsPartyUp { get; set; }
-        private static bool EventIsSandstormThere { get; set; }
-        private static bool EventIsDD2There { get; set; }
+        private static bool EventIsPartyUp { get; set; } = false;
+        private static bool EventIsSandstormThere { get; set; } = false;
+        private static bool EventIsDD2There { get; set; } = false;
+        private static bool EventIsSnowMoonThere { get; set; } = false;
+        private static bool EventIsPumpkinMoonThere { get; set; } = false;
+        private static bool EventIsBloodMoonThere { get; set; } = false;
 
 
         #region PlayerHitPatches
@@ -200,6 +203,42 @@ namespace TerraSocket
             {
                 EventIsDD2There = false;
             }
+            if (Main.pumpkinMoon)
+            {
+                if (!EventIsPumpkinMoonThere)
+                {
+                    EventIsPumpkinMoonThere = true;
+                    WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("PumpkinMoonEvent", true));
+                }
+            }
+            else
+            {
+                EventIsPumpkinMoonThere = false;
+            }
+            if (Main.snowMoon)
+            {
+                if (!EventIsSnowMoonThere)
+                {
+                    EventIsSnowMoonThere = true;
+                    WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("SnowMoonEvent", true));
+                }
+            }
+            else
+            {
+                EventIsSnowMoonThere = false;
+            }
+            if (Main.bloodMoon)
+            {
+                if (!EventIsBloodMoonThere)
+                {
+                    EventIsBloodMoonThere = true;
+                    WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("BloodMoonEvent", true));
+                }
+            }
+            else
+            {
+                EventIsBloodMoonThere = false;
+            }
         }
 
         [HarmonyPostfix]
@@ -222,14 +261,47 @@ namespace TerraSocket
             }
         }
 
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(AchievementCondition), nameof(AchievementCondition.Complete))]
-        static void OnAchievementCompletePrefix(AchievementCondition __instance)
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(WorldGen), nameof(WorldGen.meteor))]
+        static void MeteorPostfix(int i, int j, ref bool __result)
         {
-            if (__instance.IsCompleted)
+            if (__result)
             {
-                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("AchievementComplete", true, new WebSocketMessageModel.ContextInfo(null, __instance.Name)));
-            }            
+                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("MeteorLanded", true));
+            }
         }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(WorldGen), nameof(WorldGen.TriggerLunarApocalypse))]
+        static void LunarApocalypsePostfix()
+        {
+            WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("LunarApocalypseStarted", true));
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(Main),nameof(Main.StartSlimeRain))]
+        static void RainSlimeEventPostfix(bool announce = true)
+        {
+            WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("SlimeRainEvent", true));
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(Main), nameof(Main.AnglerQuestSwap))]
+        static void NewAnglerQuestPostfix()
+        {
+            WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("AnglerQuestReset", true));
+        }
+
+
+        // tModLoader, doesn't have Achievements, to use in TerrariaInjector
+        //[HarmonyPrefix]
+        //[HarmonyPatch(typeof(AchievementCondition), nameof(AchievementCondition.Complete))]
+        //static void OnAchievementCompletePrefix(AchievementCondition __instance)
+        //{
+        //    if (__instance.IsCompleted)
+        //    {
+        //        WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("AchievementComplete", true, new WebSocketMessageModel.ContextInfo(null, __instance.Name)));
+        //    }
+        //}
     }
 }
