@@ -1,47 +1,68 @@
 ﻿using Newtonsoft.Json;
 using WebSocketSharp;
 using WebSocketSharp.Server;
-using HarmonyLib;
 
 namespace TerraSocket
 {
-    public static class WebSocketServerHelper
+    public class WebSocketServerHelper
     {
-        public static WebSocketServer wssv { get; set; } = new WebSocketServer("ws://127.0.0.1");
-        public static void CloseServer()
+        public WebSocketServerHelper(string ip = "127.0.0.1", short port = 7394)
+        {
+            wssv = InitializeServer(ip, port);
+        }
+
+        public static WebSocketServer wssv { get; set; }
+        public void CloseServer()
         {
             wssv.Stop();
         }
-        public static WebSocketServer InitializeServer()
+        private WebSocketServer InitializeServer(string ip, short port)
         {
-            wssv = new WebSocketServer("ws://127.0.0.1");
+            string addr = $"ws://{ip}:{port}";
+            wssv = new WebSocketServer(addr);
             wssv.AddWebSocketService<Startup>("/");
             wssv.Start();
+            TerraSocket._logger.Info($"WebSocket server started at \"{ip + ':' + port}\"");
             return wssv;
         }
-        public static void SendWSMessage(WebSocketMessageModel msg)
+        public void SendWSMessage(WebSocketMessageModel msg)
         {
             string jsonMessage = JsonConvert.SerializeObject(msg);
-            if (wssv != null)
+            if (!(wssv is null))
             {
                 wssv.WebSocketServices.Broadcast(jsonMessage);
-                TerraSocket._logger.Debug($"\"{msg.Event}\" sent to clients.");
+                TerraSocket._logger.Info($"\"{msg.Event}\" sent to clients.");
             }
-                
-                
+            else
+            {
+                TerraSocket._logger.Warn("WebSocket Server not found.");
+            }
+
         }
     }
     public class Startup : WebSocketBehavior
     {
         protected override void OnClose(CloseEventArgs e)
         {
-            Send("Closing WebSocket Server.");
+            TerraSocket._logger.Info($"Client Disconnected. ID:{ID}");
             base.OnClose(e);
         }
         protected override void OnOpen()
         {
             TerraSocket._logger.Info($"Client joined. ID:{ID}");
             base.OnOpen();
+        }
+        protected override void OnMessage(MessageEventArgs e)
+        {
+            TerraSocket._logger.Debug($"Message received: {e.Data}");
+            //Commands.KillPlayer("ConfuzzedCat");
+            Commands.CommandHandler(e.Data);
+            base.OnMessage(e);
+        }
+        protected override void OnError(ErrorEventArgs e)
+        {
+            TerraSocket._logger.Error("WebSocket Error", e.Exception);
+            base.OnError(e);
         }
     }
 }

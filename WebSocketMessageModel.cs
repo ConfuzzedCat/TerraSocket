@@ -20,7 +20,7 @@
         public SemVersion webSocketServerVersion { get; private set; }
         private void SetWebSocketServerVersion()
         {
-            webSocketServerVersion = new SemVersion(0, 6, 0);
+            webSocketServerVersion = new SemVersion();
         }
         public string Event { get; set; }
         public string Status { get; set; }
@@ -28,28 +28,35 @@
 
         public class SemVersion
         {
-            public SemVersion(int major, int minor, int patch)
+            public SemVersion()
             {
-                MajorVersion = major;
-                MinorVersion = minor;
-                PatchVersion = patch;
+                MajorVersion = 1;
+                MinorVersion = 0;
+                PatchVersion = 0;
             }
             public int MajorVersion { get; set; }
             public int MinorVersion { get; set; }
             public int PatchVersion { get; set; }
+            public string ToStringDot()
+            {
+                return $"{MajorVersion}.{MinorVersion}.{PatchVersion}";
+            }
         }
 
         public class ContextInfo
         {
-            public ContextInfo(string player = null, string achievement = null, ContextPlayerDamage contextPlayerDamage = null, ContextNPCDamage npcDamage = null, ContextNPCKilled npcKilled = null, ContextPlayerKilled playerKilled = null, ContextBossSpawn bossSpawn = null)
+            public ContextInfo(string player = null, params object[] Info)
             {
                 Player = player;
-                Achievement = achievement;
-                PlayerDamage = contextPlayerDamage;
-                NPCDamage = npcDamage;
-                NPCKilled = npcKilled;
-                PlayerKilled = playerKilled;
-                BossSpawn = bossSpawn;
+                foreach (var item in Info)
+                {
+                    if (item is string) Achievement = (string)item;
+                    if (item is ContextPlayerDamage) PlayerDamage = (ContextPlayerDamage)item;
+                    if (item is ContextNPCDamage) NPCDamage = (ContextNPCDamage)item;
+                    if (item is ContextNPCKilled) NPCKilled = (ContextNPCKilled)item;
+                    if (item is ContextPlayerKilled) PlayerKilled = (ContextPlayerKilled)item;
+                    if (item is ContextBossSpawn) BossSpawn = (ContextBossSpawn)item;
+                }
             }
             public string Player { get; set; }
             public string Achievement { get; set; }

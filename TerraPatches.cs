@@ -19,6 +19,7 @@ namespace TerraSocket
         private static bool EventIsSnowMoonThere { get; set; } = false;
         private static bool EventIsPumpkinMoonThere { get; set; } = false;
         private static bool EventIsBloodMoonThere { get; set; } = false;
+        public static WebSocketServerHelper _server { get; set; }
 
 
         #region PlayerHitPatches
@@ -33,11 +34,11 @@ namespace TerraSocket
             string npcName = npc.FullName;
             if (__instance.player.statLife <= 0)
             {
-                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("PlayerKilled", true, new WebSocketMessageModel.ContextInfo(playerName, null, null, null, null, new WebSocketMessageModel.ContextInfo.ContextPlayerKilled(playerName, "NPC", npcName, __instance.player.statLife + damage, damage, __instance.player.statLife * -1))));
+                _server.SendWSMessage(new WebSocketMessageModel("PlayerKilled", true, new WebSocketMessageModel.ContextInfo(playerName, new WebSocketMessageModel.ContextInfo.ContextPlayerKilled(playerName, "NPC", npcName, __instance.player.statLife + damage, damage, __instance.player.statLife * -1))));
             }
             else
             {
-                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("PlayerHit", true, new WebSocketMessageModel.ContextInfo(playerName, null, new WebSocketMessageModel.ContextInfo.ContextPlayerDamage(playerName, damage, crit, false, false, 0, "NPC", npcName))));
+                _server.SendWSMessage(new WebSocketMessageModel("PlayerHit", true, new WebSocketMessageModel.ContextInfo(playerName, new WebSocketMessageModel.ContextInfo.ContextPlayerDamage(playerName, damage, crit, false, false, 0, "NPC", npcName))));
             }
         }
 
@@ -52,11 +53,11 @@ namespace TerraSocket
             string projName = proj.Name;
             if (__instance.player.statLife <= 0)
             {
-                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("PlayerKilled", true, new WebSocketMessageModel.ContextInfo(playerName, null, null, null, null, new WebSocketMessageModel.ContextInfo.ContextPlayerKilled(playerName, "PROJECTILE", projName, __instance.player.statLife + damage, damage, __instance.player.statLife * -1))));
+                _server.SendWSMessage(new WebSocketMessageModel("PlayerKilled", true, new WebSocketMessageModel.ContextInfo(playerName, new WebSocketMessageModel.ContextInfo.ContextPlayerKilled(playerName, "PROJECTILE", projName, __instance.player.statLife + damage, damage, __instance.player.statLife * -1))));
             }
             else
             {
-                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("PlayerHit", true, new WebSocketMessageModel.ContextInfo(playerName, null, new WebSocketMessageModel.ContextInfo.ContextPlayerDamage(playerName, damage, crit, false, false, 0, "PROJECTILE", projName))));
+                _server.SendWSMessage(new WebSocketMessageModel("PlayerHit", true, new WebSocketMessageModel.ContextInfo(playerName, new WebSocketMessageModel.ContextInfo.ContextPlayerDamage(playerName, damage, crit, false, false, 0, "PROJECTILE", projName))));
 
             }
 
@@ -77,11 +78,11 @@ namespace TerraSocket
             string npcName = target.FullName;
             if (target.life <= 0)
             {
-                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("NPCKilled", true, new WebSocketMessageModel.ContextInfo(playerName, null, null, null, new WebSocketMessageModel.ContextInfo.ContextNPCKilled(npcName, itemNameWithPrefix, "MEELEE_ITEM", itemName, playerName, target.life + damage, damage, target.life * -1))));
+                _server.SendWSMessage(new WebSocketMessageModel("NPCKilled", true, new WebSocketMessageModel.ContextInfo(playerName, new WebSocketMessageModel.ContextInfo.ContextNPCKilled(npcName, itemNameWithPrefix, "MEELEE_ITEM", itemName, playerName, target.life + damage, damage, target.life * -1))));
             }
             else
             {
-                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("NPCHit", true, new WebSocketMessageModel.ContextInfo(playerName, null, null, new WebSocketMessageModel.ContextInfo.ContextNPCDamage(npcName, "MEELEE_ITEM", itemName, playerName, target.life + damage, damage), null)));
+                _server.SendWSMessage(new WebSocketMessageModel("NPCHit", true, new WebSocketMessageModel.ContextInfo(playerName, new WebSocketMessageModel.ContextInfo.ContextNPCDamage(npcName, "MEELEE_ITEM", itemName, playerName, target.life + damage, damage))));
             }
         }
 
@@ -97,11 +98,11 @@ namespace TerraSocket
             string npcName = target.FullName;
             if (target.life < 0)
             {
-                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("NPCKilled", true, new WebSocketMessageModel.ContextInfo(playerName, null, null, null, new WebSocketMessageModel.ContextInfo.ContextNPCKilled(npcName, null, "PROJECTILE", projName, playerName, target.life + damage, damage, target.life * -1))));
+                _server.SendWSMessage(new WebSocketMessageModel("NPCKilled", true, new WebSocketMessageModel.ContextInfo(playerName, new WebSocketMessageModel.ContextInfo.ContextNPCKilled(npcName, null, "PROJECTILE", projName, playerName, target.life + damage, damage, target.life * -1))));
             }
             else
             {
-                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("NPCHit", true, new WebSocketMessageModel.ContextInfo(playerName, null, null, new WebSocketMessageModel.ContextInfo.ContextNPCDamage(npcName, "PROJECTILE", projName, playerName, target.life + damage, damage), null)));
+                _server.SendWSMessage(new WebSocketMessageModel("NPCHit", true, new WebSocketMessageModel.ContextInfo(playerName, new WebSocketMessageModel.ContextInfo.ContextNPCDamage(npcName, "PROJECTILE", projName, playerName, target.life + damage, damage), null)));
             }
         }
         #endregion
@@ -113,11 +114,11 @@ namespace TerraSocket
             string playerName = __instance.player.name;
             if (target.statLife <= 0)
             {
-                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("PlayerPVPKill", true, new WebSocketMessageModel.ContextInfo(playerName, null, null, null, null, new WebSocketMessageModel.ContextInfo.ContextPlayerKilled(target.name, "MEELEE_ITEM", item.Name, target.statLife + damage, damage, target.statLife * -1))));
+                _server.SendWSMessage(new WebSocketMessageModel("PlayerPVPKill", true, new WebSocketMessageModel.ContextInfo(playerName, new WebSocketMessageModel.ContextInfo.ContextPlayerKilled(target.name, "MEELEE_ITEM", item.Name, target.statLife + damage, damage, target.statLife * -1))));
             }
             else
             {
-                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("PlayerPVPHit", true, new WebSocketMessageModel.ContextInfo(playerName, null, new WebSocketMessageModel.ContextInfo.ContextPlayerDamage(target.name, damage, crit, true, false, 0, "MEELEE_ITEM", item.Name))));
+                _server.SendWSMessage(new WebSocketMessageModel("PlayerPVPHit", true, new WebSocketMessageModel.ContextInfo(playerName, new WebSocketMessageModel.ContextInfo.ContextPlayerDamage(target.name, damage, crit, true, false, 0, "MEELEE_ITEM", item.Name))));
             }
         }
 
@@ -128,11 +129,11 @@ namespace TerraSocket
             string playerName = __instance.player.name;
             if (target.statLife <= 0)
             {
-                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("PlayerPVPKill", true, new WebSocketMessageModel.ContextInfo(playerName, null, null, null, null, new WebSocketMessageModel.ContextInfo.ContextPlayerKilled(target.name, "PROJECTILE", proj.Name, target.statLife + damage, damage, target.statLife * -1))));
+                _server.SendWSMessage(new WebSocketMessageModel("PlayerPVPKill", true, new WebSocketMessageModel.ContextInfo(playerName, new WebSocketMessageModel.ContextInfo.ContextPlayerKilled(target.name, "PROJECTILE", proj.Name, target.statLife + damage, damage, target.statLife * -1))));
             }
             else
             {
-                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("PlayerPVPHit", true, new WebSocketMessageModel.ContextInfo(playerName, null, new WebSocketMessageModel.ContextInfo.ContextPlayerDamage(target.name, damage, crit, true, false, 0, "PROJECTILE", proj.Name))));
+                _server.SendWSMessage(new WebSocketMessageModel("PlayerPVPHit", true, new WebSocketMessageModel.ContextInfo(playerName, new WebSocketMessageModel.ContextInfo.ContextPlayerDamage(target.name, damage, crit, true, false, 0, "PROJECTILE", proj.Name))));
             }
         }
 
@@ -140,28 +141,28 @@ namespace TerraSocket
         [HarmonyPatch(typeof(ModPlayer), nameof(ModPlayer.OnEnterWorld))]
         static void OnEnterWorldPostfix(Player player)
         {
-            WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("OnEnterWorld", true, new WebSocketMessageModel.ContextInfo(player.name)));
+            _server.SendWSMessage(new WebSocketMessageModel("OnEnterWorld", true, new WebSocketMessageModel.ContextInfo(player.name)));
         }
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(ModPlayer), nameof(ModPlayer.OnRespawn))]
         static void OnRespawnPostfix(Player player)
         {
-            WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("OnRespawn", true, new WebSocketMessageModel.ContextInfo(player.name)));
+            _server.SendWSMessage(new WebSocketMessageModel("OnRespawn", true, new WebSocketMessageModel.ContextInfo(player.name)));
         }
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(ModPlayer), nameof(ModPlayer.PlayerConnect))]
         static void PlayerConnectPostfix(Player player)
         {
-            WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("PlayerConnect", true, new WebSocketMessageModel.ContextInfo(player.name)));
+            _server.SendWSMessage(new WebSocketMessageModel("PlayerConnect", true, new WebSocketMessageModel.ContextInfo(player.name)));
         }
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(ModPlayer), nameof(ModPlayer.PlayerDisconnect))]
         static void PlayerDisconnectPostfix(Player player)
         {
-            WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("PlayerDisconnect", true, new WebSocketMessageModel.ContextInfo(player.name)));
+            _server.SendWSMessage(new WebSocketMessageModel("PlayerDisconnect", true, new WebSocketMessageModel.ContextInfo(player.name)));
         }
 
         [HarmonyPostfix]
@@ -173,66 +174,71 @@ namespace TerraSocket
                 if (!EventIsPartyUp)
                 {
                     EventIsPartyUp = true;
-                    WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("PartyEvent", true));
+                    _server.SendWSMessage(new WebSocketMessageModel("PartyEvent", true));
                 }
             }
             else
             {
                 EventIsPartyUp = false;
             }
+
             if (Sandstorm.Happening)
             {
                 if (!EventIsSandstormThere)
                 {
                     EventIsSandstormThere = true;
-                    WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("SandstormEvent", true));
+                    _server.SendWSMessage(new WebSocketMessageModel("SandstormEvent", true));
                 }
             }
             else
             {
                 EventIsSandstormThere = false;
             }
+
             if (DD2Event.Ongoing)
             {
                 if (!EventIsDD2There)
                 {
-                    WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("DD2Event", true));
+                    _server.SendWSMessage(new WebSocketMessageModel("DD2Event", true));
                 }
             }
             else
             {
                 EventIsDD2There = false;
             }
+
             if (Main.pumpkinMoon)
             {
                 if (!EventIsPumpkinMoonThere)
                 {
                     EventIsPumpkinMoonThere = true;
-                    WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("PumpkinMoonEvent", true));
+                    _server.SendWSMessage(new WebSocketMessageModel("PumpkinMoonEvent", true));
                 }
             }
             else
             {
                 EventIsPumpkinMoonThere = false;
             }
+
             if (Main.snowMoon)
             {
                 if (!EventIsSnowMoonThere)
                 {
                     EventIsSnowMoonThere = true;
-                    WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("SnowMoonEvent", true));
+                    _server.SendWSMessage(new WebSocketMessageModel("SnowMoonEvent", true));
                 }
             }
             else
             {
                 EventIsSnowMoonThere = false;
             }
+
             if (Main.bloodMoon)
             {
                 if (!EventIsBloodMoonThere)
                 {
                     EventIsBloodMoonThere = true;
-                    WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("BloodMoonEvent", true));
+                    _server.SendWSMessage(new WebSocketMessageModel("BloodMoonEvent", true));
                 }
             }
             else
@@ -250,13 +256,13 @@ namespace TerraSocket
             int npcLife = npc.life;
             if (npc.boss)
             {
-                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("BossSpawn", true, new WebSocketMessageModel.ContextInfo(null, null, null, null, null, null, new WebSocketMessageModel.ContextInfo.ContextBossSpawn(npcName, npcLife))));
+                _server.SendWSMessage(new WebSocketMessageModel("BossSpawn", true, new WebSocketMessageModel.ContextInfo(null, new WebSocketMessageModel.ContextInfo.ContextBossSpawn(npcName, npcLife))));
             }
 
             switch (__result)
             {
                 case 437:
-                    WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("CultistRitualStarted", true));
+                    _server.SendWSMessage(new WebSocketMessageModel("CultistRitualStarted", true));
                     break;
             }
         }
@@ -267,7 +273,7 @@ namespace TerraSocket
         {
             if (__result)
             {
-                WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("MeteorLanded", true));
+                _server.SendWSMessage(new WebSocketMessageModel("MeteorLanded", true));
             }
         }
 
@@ -275,25 +281,25 @@ namespace TerraSocket
         [HarmonyPatch(typeof(WorldGen), nameof(WorldGen.TriggerLunarApocalypse))]
         static void LunarApocalypsePostfix()
         {
-            WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("LunarApocalypseStarted", true));
+            _server.SendWSMessage(new WebSocketMessageModel("LunarApocalypseStarted", true));
         }
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(Main),nameof(Main.StartSlimeRain))]
         static void RainSlimeEventPostfix(bool announce = true)
         {
-            WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("SlimeRainEvent", true));
+            _server.SendWSMessage(new WebSocketMessageModel("SlimeRainEvent", true));
         }
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(Main), nameof(Main.AnglerQuestSwap))]
         static void NewAnglerQuestPostfix()
         {
-            WebSocketServerHelper.SendWSMessage(new WebSocketMessageModel("AnglerQuestReset", true));
+            _server.SendWSMessage(new WebSocketMessageModel("AnglerQuestReset", true));
         }
 
 
-        // tModLoader, doesn't have Achievements, to use in TerrariaInjector
+        // tModLoader, doesn't have Achievements, to be used in TerrariaInjector
         //[HarmonyPrefix]
         //[HarmonyPatch(typeof(AchievementCondition), nameof(AchievementCondition.Complete))]
         //static void OnAchievementCompletePrefix(AchievementCondition __instance)
