@@ -31,13 +31,13 @@ namespace TerraSocket
                 {
                     Logger.Error("Invalid content in wsipconfig.json", e);
                     config = DefaultIp();
-                    File.WriteAllText(ipPath, JsonConvert.SerializeObject(config));
+                    File.WriteAllText(ipPath, JsonConvert.SerializeObject(config));//TODO: make it nice!
                 }
             }
             else
             {
                 config = DefaultIp();
-                File.WriteAllText(ipPath, JsonConvert.SerializeObject(config));
+                File.WriteAllText(ipPath, JsonConvert.SerializeObject(config));//TODO: make it nice!
             }
 
             Server = new WebSocketServerHelper(config.Host, config.Port);
