@@ -78,11 +78,11 @@ namespace TerraSocket
             string npcName = target.FullName;
             if (target.life <= 0)
             {
-                _server.SendWSMessage(new WebSocketMessageModel("NPCKilled", true, new WebSocketMessageModel.ContextInfo(playerName, new WebSocketMessageModel.ContextInfo.ContextNPCKilled(npcName, itemNameWithPrefix, "MEELEE_ITEM", itemName, playerName, target.life + damage, damage, target.life * -1))));
+                _server.SendWSMessage(new WebSocketMessageModel("NPCKilled", true, new WebSocketMessageModel.ContextInfo(playerName, new WebSocketMessageModel.ContextInfo.ContextNPCKilled(npcName, itemNameWithPrefix, "MEELEE", itemName, playerName, target.life + damage, damage, target.life * -1))));
             }
             else
             {
-                _server.SendWSMessage(new WebSocketMessageModel("NPCHit", true, new WebSocketMessageModel.ContextInfo(playerName, new WebSocketMessageModel.ContextInfo.ContextNPCDamage(npcName, "MEELEE_ITEM", itemName, playerName, target.life + damage, damage))));
+                _server.SendWSMessage(new WebSocketMessageModel("NPCHit", true, new WebSocketMessageModel.ContextInfo(playerName, new WebSocketMessageModel.ContextInfo.ContextNPCDamage(npcName, "MEELEE", itemName, playerName, target.life + damage, damage))));
             }
         }
 
@@ -114,11 +114,11 @@ namespace TerraSocket
             string playerName = __instance.player.name;
             if (target.statLife <= 0)
             {
-                _server.SendWSMessage(new WebSocketMessageModel("PlayerPVPKill", true, new WebSocketMessageModel.ContextInfo(playerName, new WebSocketMessageModel.ContextInfo.ContextPlayerKilled(target.name, "MEELEE_ITEM", item.Name, target.statLife + damage, damage, target.statLife * -1))));
+                _server.SendWSMessage(new WebSocketMessageModel("PlayerKilled", true, new WebSocketMessageModel.ContextInfo(playerName, new WebSocketMessageModel.ContextInfo.ContextPlayerKilled(target.name, "MEELEE", item.Name, target.statLife + damage, damage, target.statLife * -1, false))));
             }
             else
             {
-                _server.SendWSMessage(new WebSocketMessageModel("PlayerPVPHit", true, new WebSocketMessageModel.ContextInfo(playerName, new WebSocketMessageModel.ContextInfo.ContextPlayerDamage(target.name, damage, crit, true, false, 0, "MEELEE_ITEM", item.Name))));
+                _server.SendWSMessage(new WebSocketMessageModel("PlayerHit", true, new WebSocketMessageModel.ContextInfo(playerName, new WebSocketMessageModel.ContextInfo.ContextPlayerDamage(target.name, damage, crit, true, false, 0, "MEELEE", item.Name))));
             }
         }
 
@@ -129,11 +129,11 @@ namespace TerraSocket
             string playerName = __instance.player.name;
             if (target.statLife <= 0)
             {
-                _server.SendWSMessage(new WebSocketMessageModel("PlayerPVPKill", true, new WebSocketMessageModel.ContextInfo(playerName, new WebSocketMessageModel.ContextInfo.ContextPlayerKilled(target.name, "PROJECTILE", proj.Name, target.statLife + damage, damage, target.statLife * -1))));
+                _server.SendWSMessage(new WebSocketMessageModel("PlayerKilled", true, new WebSocketMessageModel.ContextInfo(playerName, new WebSocketMessageModel.ContextInfo.ContextPlayerKilled(target.name, "PROJECTILE", proj.Name, target.statLife + damage, damage, target.statLife * -1, true))));
             }
             else
             {
-                _server.SendWSMessage(new WebSocketMessageModel("PlayerPVPHit", true, new WebSocketMessageModel.ContextInfo(playerName, new WebSocketMessageModel.ContextInfo.ContextPlayerDamage(target.name, damage, crit, true, false, 0, "PROJECTILE", proj.Name))));
+                _server.SendWSMessage(new WebSocketMessageModel("PlayerHit", true, new WebSocketMessageModel.ContextInfo(playerName, new WebSocketMessageModel.ContextInfo.ContextPlayerDamage(target.name, damage, crit, true, false, 0, "PROJECTILE", proj.Name))));
             }
         }
 

@@ -132,7 +132,7 @@
 
             public class ContextPlayerKilled
             {
-                public ContextPlayerKilled(string playerName = null, string sourceType = null, string sourceName = null, int playerLifePreHit = 0, int damageDealt = 0, int overflowDamage = 0)
+                public ContextPlayerKilled(string playerName = null, string sourceType = null, string sourceName = null, int playerLifePreHit = 0, int damageDealt = 0, int overflowDamage = 0, bool pvp = false)
                 {
                     PlayerName = playerName;
                     SourceType = sourceType;
@@ -140,6 +140,8 @@
                     PlayerLifePreHit = playerLifePreHit;
                     DamageDealt = damageDealt;
                     OverflowDamage = overflowDamage;
+                    PVP = pvp;
+                    if (sourceType == "PLAYER") PVP = true;
                 }
                 public string PlayerName { get; set; }
                 public string SourceType { get; set; }
@@ -147,6 +149,7 @@
                 public int PlayerLifePreHit { get; set; }
                 public int DamageDealt { get; set; }
                 public int OverflowDamage { get; set; }
+                public bool PVP { get; set; }
             }
 
             public class ContextBossSpawn
